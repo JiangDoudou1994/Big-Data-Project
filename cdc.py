@@ -1,5 +1,6 @@
 from pyspark import SparkContext
 sc=SparkContext(appName="cdc")
+import unittest
 
 class MetaFileHandler:
     def __init__(self, file_name):
@@ -36,3 +37,24 @@ rdd_chg = rdd_combo.filter(lambda x: x[1][0] != None and x[1][1] != None and x[1
 print rdd_del.collect()
 print rdd_add.collect()
 print rdd_chg.collect()
+
+
+class cdc(unittest.TestCase):
+    test_data=[]
+    f=open(file_name)
+    for line in f.readlines():
+        line = line.strip().split(' ')
+        test_data.append(line)
+    
+    test_class=MetaFileHandler('testdata.txt')
+
+    def test_cdc(self):
+        for data in self.test_data:
+            data_before=(data[0],data[2]),(data[1],data[4])
+            data_after=self.test_class.meta_kv_mapper(data)
+            self.assertTrue(data_after==data_before)
+
+
+
+if __name__=='__main__':
+    unittest.main()
