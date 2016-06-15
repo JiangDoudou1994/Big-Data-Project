@@ -10,6 +10,7 @@ class MetaFileHandler:
 
 
 
+
 meta1 = MetaFileHandler('testdata1.txt')
 meta2 = MetaFileHandler('testdata2.txt')
 rdd1=sc.textFile(meta1.file_name)
