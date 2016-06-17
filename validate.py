@@ -2,8 +2,6 @@ from pyspark import SparkContext
 import datetime
 import dateutil.parser as par
 
-sc = SparkContext(appName="validata6.16")
-
 def parse(date):
     kwargs={}
     parsedate=par.parse(date,**kwargs)
@@ -23,7 +21,7 @@ class MetaFileHandler:
     def validate_oldest(self,time):
         oldest_time = parse('01-01-1890')
 	if time < oldest_time:
-	    return 'Older than odest time'
+	    return 'Earlier than odest time'
 	else:
 	    return ''
 
@@ -36,14 +34,14 @@ class MetaFileHandler:
 
     def validate_mon_or_sun(self,time):
         if time.weekday() == 0 or time.weekday() == 6:
-            return 'Date is monsday or sunday;'
+            return 'Date is monday or sunday;'
 	else:
 	    return ''
 
     def validate_fdm(self,time):
         day_of_time = time.strftime('%d')
 	if day_of_time <= '5':
-	    return 'Date is smaller than 5th;'
+	    return 'Date is earlier than 5th;'
 	else:
 	    return ''
 
@@ -52,7 +50,7 @@ class MetaFileHandler:
 	weekday_of_time = time.weekday()
 	if day_of_time <= 7:
 	    if weekday_of_time <= day_of_time-1 and weekday_of_time >= 0:
-	        return 'Date is smaller than FMM'
+	        return 'Date is earlier than FMM'
 	    else:
 	        return ''
 	else:
@@ -84,18 +82,11 @@ class MetaFileHandler:
     def meta_to_str(self,x):
         return (' ').join((x[0],x[1],x[2],x[3],'\n'))
 
+sc = SparkContext(appName="validata")
 meta = MetaFileHandler('testdata.txt')
-
 rdd = sc.textFile(meta.file_name)
-
 rdd_kv = rdd.map(lambda x: meta.meta_kv_mapper(x))
-
 rdd_kv_invalid = rdd_kv.map(lambda x: meta.meta_validate_fields(x)).filter(lambda x: x[3] > '')
-
 rdd_to_str = rdd_kv_invalid.map(lambda x: meta.meta_to_str(x))
-
-f = open('err_data.txt','w')
-
-data = rdd_to_str.reduce(lambda a,b: a+b)
-
-f.write(data)
+now=datetime.datetime.now()
+rdd_to_str.saveAsTextFile('error_data_{:%H_%M}.txt'.format(now))
