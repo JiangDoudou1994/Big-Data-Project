@@ -1,88 +1,74 @@
-import xml.sax
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+import sys
 
 
-class FieldHandler(xml.sax.ContentHandler):
 
-    def __init__(self):
-        self.CurrentData = ""
-        self.position = ""
-        self.element_name = ""
-        self.identifier = ""
-        self.datatype = ""
-        self.format = ""
-        self.length = ""
-        self.precision = ""
-        self.scale = ""
-        self.nullable = ""
-        self.default_value = ""
-        self.description = ""
-        self.rules = ""
+def getNodeValue(node,name):
+    return node.find(name).text
 
-    def startElement(self, tag, attributes):
-        self.CurrentData = tag
-        if tag == "field":
-            print "*****Field*****"
-
-    def endElement(self, tag):
-        if self.CurrentData == "position":
-            print "position:", self.position
-        elif self.CurrentData == "element_name":
-            print "element_name:", self.element_name
-        elif self.CurrentData == "identifier":
-            print "identifier:", self.identifier
-        elif self.CurrentData == "datatype":
-            print "datatype:", self.datatype
-        elif self.CurrentData == "format":
-            print "format:", self.format
-        elif self.CurrentData == "length":
-            print "length:", self.length
-        elif self.CurrentData == "precision":
-            print "precision:", self.precision
-        elif self.CurrentData == "scale":
-            print "scale:", self.scale
-        elif self.CurrentData == "nullable":
-            print "nullable:", self.nullable
-        elif self.CurrentData == "default_value":
-            print "default_value:", self.default_value
-        elif self.CurrentData == "description":
-            print "Description:", self.description
-        elif self.CurrentData == "rules":
-            print "rules:", self.rules
-        self.CurrentData = ""
-
-    def characters(self, content):
-        if self.CurrentData == "position":
-            self.position = content
-        elif self.CurrentData == "element_name":
-            self.element_name = content
-        elif self.CurrentData == "identifier":
-            self.identifier = content
-        elif self.CurrentData == "datatype":
-            self.datatype = content
-        elif self.CurrentData == "format":
-            self.format = content
-        elif self.CurrentData == "length":
-            self.length = content
-        elif self.CurrentData == "precision":
-            self.precision = content
-        elif self.CurrentData == "scale":
-            self.scale = content
-        elif self.CurrentData == "nullable":
-            self.nullable = content
-        elif self.CurrentData == "default_value":
-            self.default_value = content
-        elif self.CurrentData == "":
-            self.precision = content
-        elif self.CurrentData == "description":
-            self.description = content
-        elif self.CurrentData == "rules":
-            self.rules = content
+def getRulesValue(node,name="rules"):
+    
+    filed_rules=[]
+    for child in node:
+        #print child.tag,child.text
+        if child.tag == "rules" and child.text.strip() != None:
+            for rules in child:
+                for rule in rules:
+                    filed_rules.append(rule.text)
+    return filed_rules
 
 
-if (__name__ == "__main__"):
+def getXmlData(file_name="smartbase_meta_sample.xml"):
+    try:
+        tree = ET.parse(file_name)
+        meta = tree.getroot()
+    except Exception, e:
+        print "Error:cannot parse file:",file_name
+        sys.exit(1)
+    field_list=[]
+    for field in meta:
+        position = getNodeValue(field,"position")
+        print position
+        element_name = getNodeValue(field, 'element_name')
+        print element_name
+        identifier = getNodeValue(field, 'identifier')
+        print identifier
+        datatype = getNodeValue(field, 'datatype')
+        print datatype
+        format = getNodeValue(field, 'format')
+        print format
+        length = getNodeValue(field, 'length')
+        print length
+        precision = getNodeValue(field, 'precision')
+        print precision
+        scale = getNodeValue(field, 'scale')
+        print scale
+        nullable = getNodeValue(field, 'nullable')
+        print nullable
+        default_value = getNodeValue(field, 'default_value')
+        print default_value
+        description = getNodeValue(field, 'description')
+        print description
+        rules = getRulesValue(field, 'rules')
+        print str(rules)
+        print "*"*30
 
-    parser = xml.sax.make_parser()
-    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-    Handler = FieldHandler()
-    parser.setContentHandler(Handler)
-    parser.parse("smartbase_meta_sample.xml")
+        field = {}
+        field['position'], field['element_name'], field['identifier'], field['datatype'], field['format'],field['length'],field['precision'],field['scale'],field['nullable'],field['default_value'],field['description'] ,field['rules'] = (
+            position, element_name, identifier, datatype, format, length, precision, scale, nullable, default_value, description, rules
+        )
+        field_list.append(field)   
+    return field_list
+               
+def test_load_xml():
+    field_list = getXmlData()
+    for field in field_list :
+        print '-----------------------------------------------------'
+        print field
+            
+if __name__ == "__main__":
+    test_load_xml()
+
