@@ -6,14 +6,13 @@ import sys
 
 
 
-def getNodeValue(node,name):
+def getNodeValue(node, name):
     return node.find(name).text
 
-def getRulesValue(node,name="rules"):
+def getRulesValue(node, name = "rules"):
     
-    filed_rules=[]
+    filed_rules = []
     for child in node:
-        #print child.tag,child.text
         if child.tag == "rules" and child.text.strip() != None:
             for rules in child:
                 for rule in rules:
@@ -21,46 +20,44 @@ def getRulesValue(node,name="rules"):
     return filed_rules
 
 
-def getXmlData(file_name="smartbase_meta_sample.xml"):
+def getXmlData(file_name = "smartbase_meta_sample.xml"):
     try:
         tree = ET.parse(file_name)
         meta = tree.getroot()
     except Exception, e:
-        print "Error:cannot parse file:",file_name
+        print "Error:cannot parse file:", file_name
         sys.exit(1)
-    field_list=[]
+        
+    field_list = []
+    
     for field in meta:
         position = getNodeValue(field,"position")
-        print position
         element_name = getNodeValue(field, 'element_name')
-        print element_name
         identifier = getNodeValue(field, 'identifier')
-        print identifier
         datatype = getNodeValue(field, 'datatype')
-        print datatype
         format = getNodeValue(field, 'format')
-        print format
         length = getNodeValue(field, 'length')
-        print length
         precision = getNodeValue(field, 'precision')
-        print precision
         scale = getNodeValue(field, 'scale')
-        print scale
         nullable = getNodeValue(field, 'nullable')
-        print nullable
         default_value = getNodeValue(field, 'default_value')
-        print default_value
         description = getNodeValue(field, 'description')
-        print description
         rules = getRulesValue(field, 'rules')
-        print str(rules)
-        print "*"*30
 
         field = {}
-        field['position'], field['element_name'], field['identifier'], field['datatype'], field['format'],field['length'],field['precision'],field['scale'],field['nullable'],field['default_value'],field['description'] ,field['rules'] = (
-            position, element_name, identifier, datatype, format, length, precision, scale, nullable, default_value, description, rules
+        
+        field['position'], field['element_name'], field['identifier'], \
+        field['datatype'], field['format'], field['length'], \
+        field['precision'], field['scale'], field['nullable'], \
+        field['default_value'], field['description'] , field['rules'] = (
+            position, element_name, identifier, \
+            datatype, format, length, \
+            precision, scale, nullable, \
+            default_value, description, rules
         )
-        field_list.append(field)   
+        
+        field_list.append(field)
+        
     return field_list
                
 def test_load_xml():
@@ -71,4 +68,3 @@ def test_load_xml():
             
 if __name__ == "__main__":
     test_load_xml()
-
