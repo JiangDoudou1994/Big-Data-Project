@@ -38,8 +38,12 @@ def create_file(name):
 		temp=random.randint(1,3)
 		time1=generate_time(temp)
 		time2=generate_time(temp)
-		key1=generate_key()
-		key2=generate_key()
+		if 1000<i<=1500:
+			key1=str(i)
+			key2=str(1500-i)
+                else:
+                	key1=generate_key()
+                	key2=generate_key()
 		name=generate_name()
 		testdata.append(key1+' '+time1+' '+key2+' '+name+' '+time2)
 	m=len(testdata)
