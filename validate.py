@@ -21,27 +21,27 @@ class MetaFileHandler:
     def validate_oldest(self,time,oldest='01-01-1890'):
         oldest_time = parse(oldest)
         if time < oldest_time:
-            return 'Earlier than odest time'
+            return 'Earlier than odest time; '
         else:
             return ''
 
     def validate_now(self,time,now='16-06-2016'):
         now = parse(now)
         if time > now:
-            return 'Greater than now'
+            return 'Greater than now; '
         else:
             return ''
 
     def validate_weekdays(self,time,weekdays=[0,6]):
         if time.weekday() in weekdays:
-            return 'Date is in invalid;'
+            return 'Date is in invalid; '
         else:
             return ''
 
     def validate_fdm(self,time,day_add=5):
         day_of_time = time.strftime('%d')
         if day_of_time <= day_add:
-            return 'Date is earlier than 5th;'
+            return 'Date is earlier than 5th; '
         else:
             return ''
 
@@ -50,7 +50,7 @@ class MetaFileHandler:
         weekday_of_time = time.weekday()
         if day_of_time <= 7:
             if weekday_of_time <= day_of_time-1 and weekday_of_time >= 0:
-                return 'Date is earlier than FMM'
+                return 'Date is earlier than FMM; '
             else:
                 return ''
         else:
