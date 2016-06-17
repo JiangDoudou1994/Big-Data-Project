@@ -1,4 +1,4 @@
-f = open('smartbase_meta_sample.xml')
+f = open('meta_sample.xml')
 lines = f.readlines()
 i = 0
 count_line = []
