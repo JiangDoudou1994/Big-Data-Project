@@ -1,3 +1,4 @@
 *.txt/
 *.txt
 *.pyc
+cdc_*/

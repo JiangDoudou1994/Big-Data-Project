@@ -1,31 +1,7 @@
 from pyspark import SparkContext
 
 import datetime
-import dateutil.parser as par
-
-
-def parse(date):
-    parsedate = None
-    formats = ['%M%d%Y', '%M,%d,%Y', '%M/%d/%Y', '%B,%d,%Y']
-    for df in formats:
-
-        try:
-            parsedate = datetime.datetime.strptime(date, df)
-        except ValueError, error:
-            print error
-            pass
-        else:
-            break
-
-    if parsedate is None:
-
-        print '------------------Wrong date-----------------------------'
-        print date
-        print '-----------------------------------------------'
-        parsedate = datetime.datetime.now()
-
-    return parsedate
-
+from utils import date_helper
 
 class MetaFileHandler:
 
@@ -37,10 +13,10 @@ class MetaFileHandler:
         return (x[0], x[2]), (x[1], x[4])
 
     def handle_data(self, x):
-        time1 = parse(x[1][0])
-        time2 = parse(x[1][1])
-        x10 = time1.strftime('%M-%d-%Y')
-        x11 = time2.strftime('%M-%d-%Y')
+        time1 = date_helper.parse(x[1][0])
+        time2 = date_helper.parse(x[1][1])
+        x10 = time1.strftime('%m-%d-%Y')
+        x11 = time2.strftime('%m-%d-%Y')
         return (x[0][0].split('.')[0], x[0][1].split('.')[0]), (x10, x11)
 
 sc = SparkContext(appName="cdc")
