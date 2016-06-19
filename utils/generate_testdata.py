@@ -21,7 +21,7 @@ def generate_time(temp):
     if temp == 2:
         time = mounth + day + year
     if temp == 3:
-        time = change_to_eng(mounth) + ',' + day + ',' + year
+        time = '"'+change_to_eng(mounth) + ' ' + day + ' ' + year+'"'
     return time
 
 
@@ -50,8 +50,7 @@ def create_file(name):
             key1 = generate_key()
             key2 = generate_key()
         name = generate_name()
-        testdata.append(key1 + ' ' + time1 + ' ' +
-                        key2 + ' ' + name + ' ' + time2)
+        testdata.append(','.join([key1,time1,key2,name,time2]))
     m = len(testdata)
     for i in range(m):
         if i == 0:

@@ -13,5 +13,5 @@ class PlaceHolder:
 
 # first day of month
     def fdm(self,value):
-        time = date_helper.parse(value)
-        return datetime.date(time.year, time.month, 1).strftime('%m/%d/%Y')
+#        time = date_helper.parse(value)
+        return datetime.date(value.year, value.month, 1).strftime('%m/%d/%Y')

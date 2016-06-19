@@ -14,6 +14,5 @@ class Function():
         return result.strftime("%m/%d/%Y")
 
     def day_of_week(self,value):
-       date=datetime.datetime.strptime(value,"%m/%d/%Y")
-       return date.weekday()
+       return str(value.weekday())
 

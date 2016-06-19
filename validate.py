@@ -1,6 +1,7 @@
 from pyspark import SparkContext
+from utils.rule_parser import rule_parser
 import datetime
-import dateutil.parser as par
+import validate_rules
 
 
 def parse(date):
@@ -11,85 +12,46 @@ def parse(date):
 
 class MetaFileHandler:
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, rules):
         self.file_name = file_name
-        self.rules = ['>= oldest', '<= #NOW', '!IN (DayOfWeek())',
-                      '#FDM,DateAdd()', '>= #FMM']
+        self.rules = rules
 
     def meta_kv_mapper(self, x):
-        x = x.strip().split(' ')
-        return x
+        x = x.strip().split(',')
+        rule_index = [int(r[0]) - 1 for r in self.rules]
+# only return id and column with rules
+        return x[0], ([x[index] for index in rule_index])
 
-    def validate_oldest(self, time, oldest='01-01-1890'):
-        oldest_time = parse(oldest)
-        if time < oldest_time:
-            return 'Earlier than odest time; '
-        else:
-            return ''
-
-    def validate_now(self, time, now='16-06-2016'):
-        now = parse(now)
-        if time > now:
-            return 'Greater than now; '
-        else:
-            return ''
-
-    def validate_weekdays(self, time, weekdays=[0, 6]):
-        if time.weekday() in weekdays:
-            return 'Date is in invalid weekdays; '
-        else:
-            return ''
-
-    def validate_fdm(self, time, day_add=5):
-        day_of_time = int(time.strftime('%d'))
-        if day_of_time <= day_add:
-            return 'Date is earlier than 5th; '
-        else:
-            return ''
-
-    def validate_fmm(self, time):
-        day_of_time = int(time.strftime('%d'))
-        weekday_of_time = time.weekday()
-        if day_of_time <= 7:
-            if weekday_of_time + 1 >= day_of_time:
-                return 'Date is earlier than FMM; '
-            else:
-                return ''
-        else:
-            return ''
-
-    def validate_on_rules(self, rule, time):
-        err = ''
-        if rule == '>= oldest':
-            err = self.validate_oldest(time)
-        elif rule == '<= #NOW':
-            err = self.validate_now(time)
-        elif rule == '!IN (DayOfWeek())':
-            err = self.validate_weekdays(time)
-        elif rule == '#FDM,DateAdd()':
-            err = self.validate_fdm(time)
-        elif rule == '>= #FMM':
-            err = self.validate_fmm(time)
-        return err
+    def validate_on_rules(self, value, rule):
+        rp = rule_parser()
+        rule = rp.parse(value, rule)
+        validate = validate_rules.Validate()
+        return validate.validate(value, rule)
 
     def meta_validate_fields(self, x):
         err = ''
-        time = parse(x[2])
+        index = 0
         for rule in self.rules:
-            err = err + self.validate_on_rules(rule, time)
-        x[2] = time.strftime('%d-%m-%Y')
-        return x[0], x[1], x[2], err
+            for u in rule[1].split(';'):
+                if(not self.validate_on_rules(x[1][index], u.encode('ascii')[1:-1])):
+                    err = err + u
+            index += 1
+        return [x, err]
 
     def meta_to_str(self, x):
-        return (' ').join((x[0], x[1], x[2], x[3], '\n'))
+        return x
 
 sc = SparkContext(appName="validata")
-meta = MetaFileHandler('testdata.txt')
+meta_data = sc.textFile("testdata.meta")
+rules = meta_data.filter(lambda x: len(x.split('||')) > 1).map(
+    lambda x: [int(x.split(',')[0]), x.split('||')[1]])
+print rules.collect()
+
+meta = MetaFileHandler('testdata.txt', rules.collect())
 rdd = sc.textFile(meta.file_name)
 rdd_kv = rdd.map(lambda x: meta.meta_kv_mapper(x))
-rdd_kv_invalid = rdd_kv.map(
-    lambda x: meta.meta_validate_fields(x)).filter(
-        lambda x: x[3] > '')
-rdd_to_str = rdd_kv_invalid.map(lambda x: meta.meta_to_str(x))
+rdd_kv_invalid = rdd_kv.map(lambda x: meta.meta_validate_fields(x)).filter(lambda x:x[1]>'')
+rdd_to_str = rdd_kv_invalid.map(
+    lambda x: meta.meta_to_str(x))  # .coalesce(1,shuffle=True)
 now = datetime.datetime.now()
 rdd_to_str.saveAsTextFile('validate_error_{:%H_%M}.txt'.format(now))
