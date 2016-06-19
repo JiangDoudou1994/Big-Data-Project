@@ -34,7 +34,7 @@ class MetaFileHandler:
         for rule in self.rules:
             for u in rule[1].split(';'):
                 if(not self.validate_on_rules(x[1][index], u.encode('ascii')[1:-1])):
-                    err = err + u
+                    err = err +" "+ x[1][index]+" should " +u
             index += 1
         return [x, err]
 
@@ -45,13 +45,13 @@ sc = SparkContext(appName="validata")
 meta_data = sc.textFile("testdata.meta")
 rules = meta_data.filter(lambda x: len(x.split('||')) > 1).map(
     lambda x: [int(x.split(',')[0]), x.split('||')[1]])
-print rules.collect()
 
 meta = MetaFileHandler('testdata.txt', rules.collect())
 rdd = sc.textFile(meta.file_name)
 rdd_kv = rdd.map(lambda x: meta.meta_kv_mapper(x))
-rdd_kv_invalid = rdd_kv.map(lambda x: meta.meta_validate_fields(x)).filter(lambda x:x[1]>'')
+rdd_kv_invalid = rdd_kv.map(
+    lambda x: meta.meta_validate_fields(x)).filter(lambda x: x[1] > '')
 rdd_to_str = rdd_kv_invalid.map(
-    lambda x: meta.meta_to_str(x))  # .coalesce(1,shuffle=True)
+    lambda x: meta.meta_to_str(x))  
 now = datetime.datetime.now()
 rdd_to_str.saveAsTextFile('validate_error_{:%H_%M}.txt'.format(now))
