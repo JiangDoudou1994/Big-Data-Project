@@ -53,10 +53,13 @@ class rule_parser:
             function=Function()
 
             methodToCall = getattr(function,self.camelcase_to_underscore( result[0]))
-            return methodToCall(*result[1:])
+            if len(result)>2:
+                return methodToCall(*result[1:])
+            else:
+                return methodToCall(self.value)
 
         except Exception as error:
-            #print error
+            print error
             return result
 
     def replace_placeholder(self, string, loc, toks):
