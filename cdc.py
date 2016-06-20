@@ -5,24 +5,34 @@ from utils import date_helper
 
 class MetaFileHandler:
 
-    def __init__(self, file_name):
+    def __init__(self, file_name,names,types):
         self.file_name = file_name
+        self.types=types
 
-    def meta_kv_mapper(self, x):
-        x = x.split(' ')
-        return (x[0], x[2]), (x[1], x[4])
+    def meta_kv_mapper(self, value):
+        try:
+            x = value.split(',')
+
+#            return (x[0], x[2]), (x[1], x[4])
+            return (x[0], x[2]), (x)
+        except Exception as error:
+            print value
 
     def handle_data(self, x):
-        time1 = date_helper.parse(x[1][0])
-        time2 = date_helper.parse(x[1][1])
-        x10 = time1.strftime('%m-%d-%Y')
-        x11 = time2.strftime('%m-%d-%Y')
-        return (x[0][0].split('.')[0], x[0][1].split('.')[0]), (x10, x11)
+        for t in self.types:
+            if t[1]=='date':
+                time1 = date_helper.parse(x[1][t[0]-1]).strftime('%m-%d-%Y')
+                x[1][t[0]-1]=time1
+
+        return x
 
 sc = SparkContext(appName="cdc")
+meta_data = sc.textFile("testdata.meta")
+names = meta_data.map(lambda x: [int(x.split(',')[0]), x.split(',')[1]])
+types = meta_data.map(lambda x: [int(x.split(',')[0]), x.split(',')[2]])
 
-meta1 = MetaFileHandler('testdata1.txt')
-meta2 = MetaFileHandler('testdata2.txt')
+meta1 = MetaFileHandler('testdata1.txt',names.collect(),types.collect())
+meta2 = MetaFileHandler('testdata2.txt',names.collect(),types.collect())
 rdd1 = sc.textFile(meta1.file_name)
 rdd2 = sc.textFile(meta2.file_name)
 rdd1_kv = rdd1.map(lambda x: meta1.meta_kv_mapper(x))
