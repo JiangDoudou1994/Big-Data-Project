@@ -62,6 +62,6 @@ def create_file(name):
     print('use time:%d' % (end - start))
     print 'ok'
 
-create_file('testdata.txt')
-create_file('testdata1.txt')
-create_file('testdata2.txt')
+create_file('validate/testdata.txt')
+create_file('cdc/testdata1.txt')
+create_file('cdc/testdata2.txt')
