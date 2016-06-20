@@ -5,7 +5,6 @@ import date_helper
 from metafile_handler import MetaFileHandler
 
 argv=sys.argv
-print argv
 
 sc = SparkContext(appName="cdc")
 meta_data1 = sc.textFile(argv[1])

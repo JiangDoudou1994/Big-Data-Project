@@ -1,5 +1,5 @@
 from pyspark import SparkContext
-from utils.rule_parser import rule_parser
+from rule_parser import rule_parser
 import datetime
 import validate_rules
 
