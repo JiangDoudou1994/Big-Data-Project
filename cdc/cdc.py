@@ -22,7 +22,7 @@ rdd_combo = rdd1_handle.fullOuterJoin(rdd2_handle)
 rdd_del = rdd_combo.filter(lambda x: x[1][0] == None)
 rdd_add = rdd_combo.filter(lambda x: x[1][1] == None)
 rdd_chg = rdd_combo.filter(lambda x: x[1][0] != None and x[1][
-                           1] != None and x[1][0] != x[1][1])
+                           1] != None and meta_handler1.compare(x[1]))
 
 now = datetime.datetime.now()
 rdd_del.saveAsTextFile('cdc_del.txt_{:%H_%M}'.format(now))
