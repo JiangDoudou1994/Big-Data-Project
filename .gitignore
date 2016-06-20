@@ -1,4 +1,5 @@
 *.txt/
 *.txt
 *.pyc
+*.log
 cdc_*/
