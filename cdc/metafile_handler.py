@@ -4,7 +4,6 @@ class MetaFileHandler:
 	def __init__(self, meta_data):
 		self.names = meta_data.map(lambda x: [int(x.split(',')[0]), x.split(',')[1]]).collect()
 		self.types = meta_data.map(lambda x: [int(x.split(',')[0]), x.split(',')[2]]).collect()
-		self.field_size=len(self.types)-1
 
 	def meta_kv_mapper(self, value):
 		try:
