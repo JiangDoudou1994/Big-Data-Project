@@ -1,4 +1,5 @@
 import sys
+import glob
 from pyspark import SparkContext
 import datetime
 from metafile_handler import MetaFileHandler
@@ -7,6 +8,8 @@ from metafile_handler import MetaFileHandler
 argv = sys.argv
 
 sc = SparkContext(appName="validate")
+for src in glob.glob('*.py'):
+    sc.addPyFile(src)
 meta_data = sc.textFile(argv[1])
 
 meta_handler = MetaFileHandler(meta_data)

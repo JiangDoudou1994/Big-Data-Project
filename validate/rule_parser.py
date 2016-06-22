@@ -1,9 +1,8 @@
-import pyparsing
+#import pyparsing
 import re
 import datetime
 import linecache
 import sys
-from pyparsing import Word, alphas, OneOrMore, replaceWith, Dict, oneOf, Regex, delimitedList, Suppress
 from placeholder import PlaceHolder
 from function import Function
 import date_helper
@@ -39,6 +38,8 @@ class rule_parser:
         return rule
 
     def parse_placeholder(self,  rule):
+#	import pyparsing
+	from pyparsing import Word, alphas, OneOrMore, replaceWith, Dict, oneOf, Regex, delimitedList, Suppress
         result = rule
         try:
             before = Regex('[^#]*')
