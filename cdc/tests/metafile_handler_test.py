@@ -18,7 +18,6 @@ def spark_context(request):
 
 def test_kv_mapper(spark_context):
     meta=spark_context.textFile('testdata.meta')
-#    data=spark_context.textFile('testdata1.txt')
     test_class = MetaFileHandler(meta)
     assert test_class.ids==[1,3]
     kv= test_class.meta_kv_mapper("key1,v1,key2,v2,v3")

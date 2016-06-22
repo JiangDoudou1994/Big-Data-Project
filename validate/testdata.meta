@@ -1,5 +1,5 @@
-1,id,int,10,,,N,id
-2,birth_date,date,20,,,N,date of birth||[< #NOW];[>= 01/01/1916]
-3,deptment_id,int,10,,,N,id of department
-4,description,varchar,,,Y,description
-5,update_date,date,20,,,N,last update time||[> DateAdd(D,1,#FDM)]
+1,id,int,10,,,N,id,Y
+2,birth_date,date,20,,,N,date of birth,N||[< #NOW];[>= 01/01/1916]
+3,deptment_id,int,10,,,N,id of department,N
+4,description,varchar,,,Y,description,Y
+5,update_date,date,20,,,N,last update time,N||[> DateAdd(D,1,#FDM)]

@@ -6,6 +6,7 @@ import validate_rules
 class MetaFileHandler:
 
     def __init__(self, meta_data):
+        self.ids= meta_data.filter(lambda x: x.split(',')[-1]=='Y').map(lambda x:int(x.split(',')[0])).collect()
         self.rules = meta_data.filter(lambda x: len(x.split('||')) > 1).map(
             lambda x: [int(x.split(',')[0]), x.split('||')[1]]).collect()
 
@@ -13,7 +14,10 @@ class MetaFileHandler:
         x = x.strip().split(',')
         rule_index = [int(r[0]) - 1 for r in self.rules]
         # only return id and column with rules
-        return x[0], ([x[index] for index in rule_index])
+        ids=[]
+        for i in self.ids:
+            ids.append(x[i-1])
+        return tuple(ids), ([x[index] for index in rule_index])
 
     def validate_on_rules(self, value, rule):
         rp = rule_parser()
