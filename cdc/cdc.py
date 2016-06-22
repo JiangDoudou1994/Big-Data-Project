@@ -10,6 +10,7 @@ argv=sys.argv
 sc = SparkContext(appName="cdc")
 for src in glob.glob('*.py'):
     sc.addPyFile(src)
+
 meta_data1 = sc.textFile(argv[1])
 meta_data2 = sc.textFile(argv[2])
 meta_handler1=MetaFileHandler(meta_data1)
