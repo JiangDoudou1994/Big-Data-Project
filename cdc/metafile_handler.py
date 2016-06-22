@@ -12,7 +12,7 @@ class MetaFileHandler:
             ids=[]
             for i in self.ids:
                 ids.append(x[i-1])
-            return (ids), (x)
+            return tuple(ids), x
         except Exception as error:
             print error
 

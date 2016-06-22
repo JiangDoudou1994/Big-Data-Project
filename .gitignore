@@ -3,4 +3,4 @@
 *.pyc
 *.log
 cdc_*/
-.cache/
+**/.cache/
