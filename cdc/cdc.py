@@ -6,19 +6,19 @@ import date_helper
 from metafile_handler import MetaFileHandler
 
 argv=sys.argv
-partitions=argv[5]
+partitions=int(argv[5])
 
 sc = SparkContext(appName="cdc")
 for src in glob.glob('*.py'):
     sc.addPyFile(src)
 
-meta_data1 = sc.textFile(argv[1],partitions)
-meta_data2 = sc.textFile(argv[2],partitions)
+meta_data1 = sc.textFile(argv[1])
+meta_data2 = sc.textFile(argv[2])
 meta_handler1=MetaFileHandler(meta_data1)
 meta_handler2=MetaFileHandler(meta_data2)
 
-rdd1 = sc.textFile(argv[3])
-rdd2 = sc.textFile(argv[4])
+rdd1 = sc.textFile(argv[3],partitions)
+rdd2 = sc.textFile(argv[4],partitions)
 
 # find key columns from meta file and generate to key-value map of rdd
 rdd1_kv = rdd1.map(lambda x: meta_handler1.meta_kv_mapper(x))
