@@ -10,6 +10,7 @@ argv = sys.argv
 sc = SparkContext(appName="validate")
 for src in glob.glob('*.py'):
     sc.addPyFile(src)
+sc.addPyFile('pyparsing.egg')
 meta_data = sc.textFile(argv[1])
 
 meta_handler = MetaFileHandler(meta_data)

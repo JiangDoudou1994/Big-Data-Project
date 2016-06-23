@@ -16,14 +16,12 @@ class MetaFileHandler:
 	    rule_index = [int(r[0]) - 1 for r in self.rules]
 	# only return id and column with rules
 	    ids=[]
-	    print self.ids
 	    for i in self.ids:
+	
 	        ids.append(x[i-1])
 		
 	    return tuple(ids), ([x[index] for index in rule_index])
-        #except BaseException as error:
-	    print self.ids
-	    print x
+        except BaseException as error:
             print error
 
     def validate_on_rules(self, value, rule):
@@ -34,16 +32,19 @@ class MetaFileHandler:
 
     def meta_validate_fields(self, x):
         err = ''
-        index = 0
 	try:
             for rule in self.rules:
+		index = 0
+		print rule[1]
                 for u in rule[1].split(';'):
                     if(not self.validate_on_rules(x[1][index], u.encode('ascii')[1:-1])):
+			print index
                         err = err + " " + x[1][index] + " should " + u
-                    index += 1
+		    index += 1
             return [x, err]
 	except BaseException as error:
 	    print error
+	    print x
 
     def meta_to_str(self, x):
         return x
