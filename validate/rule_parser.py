@@ -21,6 +21,7 @@ class rule_parser:
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', word)
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
+    # print exception of source line number
     def PrintException(self):
         exc_type, exc_obj, tb = sys.exc_info()
         f = tb.tb_frame
@@ -36,9 +37,9 @@ class rule_parser:
         rule = self.parse_placeholder(rule)
         rule = self.parse_function(rule)
         return rule
-
+	
+    # extract placeholder from rule and covert to date
     def parse_placeholder(self,  rule):
-#	import pyparsing
 	from pyparsing import Word, alphas, OneOrMore, replaceWith, Dict, oneOf, Regex, delimitedList, Suppress
         result = rule
         try:
@@ -54,6 +55,7 @@ class rule_parser:
         except Exception as error:
             return result
 
+    # calcute date
     def parse_function(self, rule):
         result = rule
         try:
@@ -75,6 +77,7 @@ class rule_parser:
         except Exception as error:
             return result
 
+    # call placeholder function to get value
     def replace_placeholder(self, string, loc, toks):
 
         tok = ''.join(toks[1:])

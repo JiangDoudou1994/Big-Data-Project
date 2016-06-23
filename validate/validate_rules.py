@@ -3,8 +3,8 @@ import re
 import date_helper 
 
 class Validate:
+    # transfer rule to python to compare
     def validate(self,value,rule):
-    #    value=datetime.datetime.strptime(value,"%m/%d/%Y")
         value=date_helper.parse(value)
         try:
             compare=rule.split(' ')[0]
