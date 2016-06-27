@@ -5,12 +5,15 @@ import datetime
 import date_helper
 from metafile_handler import MetaFileHandler
 
+
+
 argv=sys.argv
 partitions=int(argv[5])
 
 sc = SparkContext(appName="cdc")
 for src in glob.glob('*.py'):
     sc.addPyFile(src)
+sc.addPyFile('spooky.egg')
 
 meta_data1 = sc.textFile(argv[1])
 meta_data2 = sc.textFile(argv[2])
@@ -21,8 +24,8 @@ rdd1 = sc.textFile(argv[3],partitions)
 rdd2 = sc.textFile(argv[4],partitions)
 
 # find key columns from meta file and generate to key-value map of rdd
-rdd1_kv = rdd1.map(lambda x: meta_handler1.meta_kv_mapper(x))
-rdd2_kv = rdd2.map(lambda x: meta_handler2.meta_kv_mapper(x))
+rdd1_kv = rdd1.map(lambda x: meta_handler1.meta_kv_mapper(x)).partitionBy(partitions,lambda x:meta_handler1.hash_key(x[0]))
+rdd2_kv = rdd2.map(lambda x: meta_handler2.meta_kv_mapper(x)).partitionBy(partitions,lambda x:meta_handler1.hash_key(x[0]))
 
 # covert format to same 
 rdd1_handle = rdd1_kv.map(lambda x: meta_handler1.handle_data(x))

@@ -1,3 +1,4 @@
+import os
 import date_helper
 class MetaFileHandler:
 
@@ -35,4 +36,11 @@ class MetaFileHandler:
 
         return x
 
+    def hash_key(self,k):
+	# egg folder permission issue
+        os.environ['PYTHON_EGG_CACHE']='/tmp/.python-eggs/'
+        os.environ['PYTHON_EGG_DIR']='/tmp/.python-eggs/'
+        from spooky import hash64
+        s=''.join(k)
+        return hash64(s) 
 
